@@ -19,5 +19,6 @@ func New() *echo.Echo {
 	r.GET("/users/:id", controllers.GetAllUsersController)   // jwt
 	r.DELETE("/users/:id", controllers.DeleteUserController) // jwt delete
 	r.PUT("/users/:id", controllers.UpdateUserController)    // jwt put
+	r.POST("/products", controllers.CreateProductController)
 	return e
 }
