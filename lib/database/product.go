@@ -14,3 +14,26 @@ func CreateProduct(product models.Products) (interface{}, error) {
 		return product, nil
 	}
 }
+
+// Fungsi untuk mendapatkan seluruh data products
+func GetProducts() (interface{}, error) {
+	var products []models.Products
+	query := config.DB.Find(&products)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	return products, nil
+}
+
+// Fungsi untuk mendapatkan satu data product berdasarkan id product
+func GetProduct(id int) (interface{}, error) {
+	var product models.Products
+	query := config.DB.Find(&product, id)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	if query.RowsAffected == 0 {
+		return 0, query.Error
+	}
+	return product, nil
+}

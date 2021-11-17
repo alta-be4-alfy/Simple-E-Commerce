@@ -13,6 +13,8 @@ func New() *echo.Echo {
 
 	e.POST("/register", controllers.RegisterUsersController)
 	e.POST("/login", controllers.LoginUsersController) // jwt login
+	e.GET("/products", controllers.GetProductsController)
+	e.GET("/products/:id", controllers.GetProductController)
 
 	r := e.Group("/jwt")
 	r.Use(echoMid.JWT([]byte(constants.SECRET_JWT)))
