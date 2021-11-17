@@ -23,6 +23,7 @@ func InitDB() {
 
 func InitMigrate() {
 	DB.AutoMigrate(&models.Payment_Methods{})
+	DB.AutoMigrate(&models.Address{})
 	DB.AutoMigrate(&models.Users{})
 	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Products{})
@@ -49,8 +50,10 @@ func InitiateMigrateTest() {
 	DB.Migrator().DropTable(&models.Products{})
 	DB.Migrator().DropTable(&models.Orders{})
 	DB.Migrator().DropTable(&models.Users{})
+	DB.Migrator().DropTable(&models.Address{})
 	DB.Migrator().DropTable(&models.Payment_Methods{})
 	DB.AutoMigrate(&models.Payment_Methods{})
+	DB.AutoMigrate(&models.Address{})
 	DB.AutoMigrate(&models.Users{})
 	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Products{})
