@@ -50,7 +50,6 @@ func UpdateUser(id int, User models.Users) (models.Users, error) {
 	user.Password = User.Password
 	user.Phone_Number = User.Phone_Number
 	user.Gender = User.Gender
-	user.Address = User.Address
 
 	if err := config.DB.Save(&user).Error; err != nil {
 		return user, err
