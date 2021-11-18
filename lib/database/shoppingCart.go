@@ -18,7 +18,7 @@ func GetShoppingCarts(id int) (interface{}, error) {
 	var shoppingCart []Select
 	// var shoppingCart []models.Shopping_Carts
 	// query := config.DB.Find(&shoppingCart, "users_id = ?", id)
-	query := config.DB.Table("shopping_carts").Select("shopping_carts.qty, shopping_carts.price, products.product_name, users.user_name, shopping_carts.id").Joins("join products on products.id = shopping_carts.products_id").Joins("join users on users.id = shopping_carts.users_id").Where("shopping_carts.users_id = ?", id).Find(&shoppingCart)
+	query := config.DB.Table("shopping_carts").Select("shopping_carts.qty, shopping_carts.price, products.product_name, users.user_name, shopping_carts.id").Joins("join products on products.id = shopping_carts.products_id").Joins("join users on users.id = shopping_carts.users_id").Where("shopping_carts.users_id = ? AND shopping_carts.deleted_at is NULL", id).Find(&shoppingCart)
 	if query.Error != nil {
 		return nil, query.Error
 	}
