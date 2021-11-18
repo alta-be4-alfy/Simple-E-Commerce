@@ -25,5 +25,9 @@ func New() *echo.Echo {
 	r.POST("/products", controllers.CreateProductController)
 	r.PUT("/products/:id", controllers.UpdateProductController)
 	r.DELETE("/products/:id", controllers.DeleteProductController)
+	r.GET("/orders", controllers.GetAllOrderController)
+	r.GET("/orders/history", controllers.GetHistoryOrderController)
+	r.GET("/orders/cancel", controllers.GetCancelOrderController)
+	r.POST("/orders", controllers.CreateOrderController)
 	return e
 }

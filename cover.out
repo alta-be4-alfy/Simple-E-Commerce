@@ -12,11 +12,11 @@ project1/controllers/productController.go:54.2,54.97 1 1
 project1/controllers/productController.go:43.16,45.3 1 1
 project1/controllers/productController.go:48.14,50.3 1 1
 project1/controllers/productController.go:51.18,53.3 1 1
-project1/controllers/productController.go:58.53,63.14 3 1
-project1/controllers/productController.go:66.2,66.18 1 1
-project1/controllers/productController.go:69.2,69.102 1 1
-project1/controllers/productController.go:63.14,65.3 1 1
-project1/controllers/productController.go:66.18,68.3 1 1
+project1/controllers/productController.go:58.53,63.14 3 0
+project1/controllers/productController.go:66.2,66.18 1 0
+project1/controllers/productController.go:69.2,69.102 1 0
+project1/controllers/productController.go:63.14,65.3 1 0
+project1/controllers/productController.go:66.18,68.3 1 0
 project1/controllers/productController.go:73.52,76.14 2 1
 project1/controllers/productController.go:81.2,83.16 3 1
 project1/controllers/productController.go:86.2,86.21 1 1
@@ -28,7 +28,7 @@ project1/controllers/productController.go:76.14,78.3 1 1
 project1/controllers/productController.go:83.16,85.3 1 1
 project1/controllers/productController.go:86.21,88.3 1 1
 project1/controllers/productController.go:90.16,91.13 1 0
-project1/controllers/productController.go:96.43,98.3 1 1
+project1/controllers/productController.go:96.43,98.3 1 0
 project1/controllers/productController.go:105.15,107.3 1 0
 project1/controllers/productController.go:112.52,115.16 2 1
 project1/controllers/productController.go:120.2,122.16 3 1

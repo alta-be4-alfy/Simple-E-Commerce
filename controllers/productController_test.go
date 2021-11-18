@@ -913,7 +913,7 @@ func TestGetUserProductControllerSuccess(t *testing.T) {
 	}
 	t.Run("GET /jwt/products/users", func(t *testing.T) {
 		assert.Equal(t, testCases.ExpectCode, res.Code)
-		assert.Equal(t, "failed", product.Status)
+		assert.Equal(t, "success", product.Status)
 	})
 }
 

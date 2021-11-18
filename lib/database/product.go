@@ -8,6 +8,7 @@ import (
 // Fungsi untuk membuat data products baru
 func CreateProduct(product models.Products) (interface{}, error) {
 	query := config.DB.Save(&product)
+	// query := config.DB.Table("products").Select("shopping_carts.qty, shopping_carts.price, products.product_name, users.user_name, users.id").Joins("join products on products.id = shopping_carts.products_id").Joins("join users on users.id = shopping_carts.users_id").Where("shopping_carts.users_id = ?", id).Find(&shoppingCart)
 	if query.Error != nil {
 		return nil, query.Error
 	} else {
