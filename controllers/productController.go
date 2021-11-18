@@ -56,13 +56,10 @@ func GetProductController(c echo.Context) error {
 
 // Controller untuk mendapatkan seluruh data product user tertentu berdasarkan id user
 func GetUserProductController(c echo.Context) error {
-	// Mendapatkan id user yang diingikan client
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("false param"))
-	}
+	// Mendapatkan id user dari token
+	idToken := middlewares.ExtractTokenUserId(c)
 	// Mendapatkan data seluruh product user tertentu menggunakan fungsi GetUserProduct
-	product, e := database.GetUserProducts(id)
+	product, e := database.GetUserProducts(idToken)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
 	}
@@ -86,6 +83,9 @@ func UpdateProductController(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
 	}
+	if getProduct == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
+	}
 	getProductJSON, err := json.Marshal(getProduct)
 	if err != nil {
 		panic(err)
@@ -102,9 +102,6 @@ func UpdateProductController(c echo.Context) error {
 	c.Bind(&updatedProduct)
 	// Memperbaharui data menggunakan fungsi UpdateProduct
 	product, er := database.UpdateProduct(id, &updatedProduct)
-	if product == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
-	}
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to update product"))
 	}
@@ -125,6 +122,9 @@ func DeleteProductController(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
 	}
+	if getProduct == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
+	}
 	getProductJSON, err := json.Marshal(getProduct)
 	if err != nil {
 		panic(err)
@@ -137,12 +137,8 @@ func DeleteProductController(c echo.Context) error {
 	}
 
 	// Mengapus data satu product menggunakan fungsi DeleteProduct
-	product, e := database.DeleteProduct(id)
-	if e != nil {
+	if _, e := database.DeleteProduct(id); e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to delete product"))
-	}
-	if product == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
 	}
 	return c.JSON(http.StatusOK, responses.StatusSuccess("success deleted one product"))
 }
