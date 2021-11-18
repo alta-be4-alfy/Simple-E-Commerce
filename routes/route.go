@@ -2,15 +2,16 @@ package routes
 
 import (
 	"project1/constants"
+	"project1/controllers"
 	c "project1/controllers"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMid "github.com/labstack/echo/v4/middleware"
 )
 
 func New() *echo.Echo {
 	e := echo.New()
-	
+
 	e.POST("/register", controllers.RegisterUsersController)
 	e.POST("/login", controllers.LoginUsersController) // jwt login
 	e.GET("/products", controllers.GetProductsController)
