@@ -14,8 +14,9 @@ func New() *echo.Echo {
 	r := e.Group("/jwt")
 	r.Use(middleware.JWT([]byte(constants.SECRET_JWT)))
 	r.GET("/shopping_carts", c.GetShoppingCartsController)
-	r.POST("/shopping_carts/create", c.CreateShoppingCartsController)
-	r.PUT("/shopping_carts/update", c.UpdateShoppingCartsController)
+	r.POST("/shopping_carts", c.CreateShoppingCartsController)
+	r.PUT("/shopping_carts/:id", c.UpdateShoppingCartsController)
+	r.DELETE("/shopping_carts/:id", c.DeleteShoppingCartController)
 	e.POST("/login", c.LoginUsersController)
 	return e
 }
