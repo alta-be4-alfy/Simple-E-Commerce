@@ -10,5 +10,5 @@ type Orders struct {
 	UsersID           int    `json:"user_id" form:"user_id"`
 	Payment_MethodsID int    `json:"payment_methodid" form:"payment_methodid"`
 	AddressID         int    `json:"address_id" form:"address_id"`
-	Shopping_CartsID  int    `json:"shopping_cartid" form:"shopping_cartid"`
+	Shopping_CartsID  int    `json:"shopping_carts" form :"shopping_carts"`
 }
