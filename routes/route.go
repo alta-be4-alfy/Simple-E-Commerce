@@ -15,20 +15,23 @@ func New() *echo.Echo {
 	e.POST("/login", controllers.LoginUsersController) // jwt login
 	e.GET("/products", controllers.GetProductsController)
 	e.GET("/products/:id", controllers.GetProductController)
-	e.GET("/products/users/:id", controllers.GetUserProductController)
 
 	r := e.Group("/jwt")
 	r.Use(echoMid.JWT([]byte(constants.SECRET_JWT)))
 	r.GET("/users/:id", controllers.GetAllUsersController)   // jwt
 	r.DELETE("/users/:id", controllers.DeleteUserController) // jwt delete
 	r.PUT("/users/:id", controllers.UpdateUserController)    // jwt put
+	r.GET("/products/users", controllers.GetUserProductController)
 	r.POST("/products", controllers.CreateProductController)
 	r.PUT("/products/:id", controllers.UpdateProductController)
 	r.DELETE("/products/:id", controllers.DeleteProductController)
+	r.GET("/orders", controllers.GetAllOrderController)
+	r.GET("/orders/history", controllers.GetHistoryOrderController)
+	r.GET("/orders/cancel", controllers.GetCancelOrderController)
+	r.POST("/orders", controllers.CreateOrderController)
   r.GET("/shopping_carts", c.GetShoppingCartsController)
 	r.POST("/shopping_carts", c.CreateShoppingCartsController)
 	r.PUT("/shopping_carts/:id", c.UpdateShoppingCartsController)
 	r.DELETE("/shopping_carts/:id", c.DeleteShoppingCartController)
-
 	return e
 }
