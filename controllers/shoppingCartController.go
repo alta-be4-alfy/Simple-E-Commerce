@@ -91,7 +91,7 @@ func DeleteShoppingCartController(c echo.Context) error {
 
 	// Pengecekan apakah id cart memiliki id user yang sama dengan id token
 	idToken := middlewares.ExtractTokenUserId(c)
-	getShoppingCart, err := database.GetShoppingCarts(id)
+	getShoppingCart, err := database.GetShoppingCartsTanpaJoin(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
 	}
