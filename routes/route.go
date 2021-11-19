@@ -2,15 +2,15 @@ package routes
 
 import (
 	"project1/constants"
-	c "project1/controllers"
+	"project1/controllers"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMid "github.com/labstack/echo/v4/middleware"
 )
 
 func New() *echo.Echo {
 	e := echo.New()
-	
+
 	e.POST("/register", controllers.RegisterUsersController)
 	e.POST("/login", controllers.LoginUsersController) // jwt login
 	e.GET("/products", controllers.GetProductsController)
@@ -29,9 +29,9 @@ func New() *echo.Echo {
 	r.GET("/orders/history", controllers.GetHistoryOrderController)
 	r.GET("/orders/cancel", controllers.GetCancelOrderController)
 	r.POST("/orders", controllers.CreateOrderController)
-  r.GET("/shopping_carts", c.GetShoppingCartsController)
-	r.POST("/shopping_carts", c.CreateShoppingCartsController)
-	r.PUT("/shopping_carts/:id", c.UpdateShoppingCartsController)
-	r.DELETE("/shopping_carts/:id", c.DeleteShoppingCartController)
+	r.GET("/shopping_carts", controllers.GetShoppingCartsController)
+	r.POST("/shopping_carts", controllers.CreateShoppingCartsController)
+	r.PUT("/shopping_carts/:id", controllers.UpdateShoppingCartsController)
+	r.DELETE("/shopping_carts/:id", controllers.DeleteShoppingCartController)
 	return e
 }
