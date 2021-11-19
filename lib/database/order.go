@@ -5,21 +5,6 @@ import (
 	"project1/models"
 )
 
-type SelectOrder struct {
-	Total_Qty         int
-	Total_Price       int
-	Order_Status      string
-	Payment_MethodsID int
-	AddressID         int
-}
-
-type SelectCart struct {
-	Qty        int
-	Price      int
-	ProductsID int
-	UsersID    int
-}
-
 var selectCart []models.OrderResponse
 
 func GetAllOrder(id int) (interface{}, error) {
@@ -27,9 +12,9 @@ func GetAllOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	if query.RowsAffected == 0 {
-		return 0, query.Error
-	}
+	// if query.RowsAffected == 0 {
+	// 	return 0, query.Error
+	// }
 	return selectCart, nil
 }
 
@@ -38,9 +23,9 @@ func GetHistoryOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	if query.RowsAffected == 0 {
-		return 0, query.Error
-	}
+	// if query.RowsAffected == 0 {
+	// 	return 0, query.Error
+	// }
 	return selectCart, nil
 }
 
@@ -49,9 +34,9 @@ func GetCancelOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	if query.RowsAffected == 0 {
-		return 0, query.Error
-	}
+	// if query.RowsAffected == 0 {
+	// 	return 0, query.Error
+	// }
 	return selectCart, nil
 }
 
