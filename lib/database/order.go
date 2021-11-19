@@ -12,9 +12,9 @@ func GetAllOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	// if query.RowsAffected == 0 {
-	// 	return 0, query.Error
-	// }
+	if query.RowsAffected == 0 {
+		return 0, query.Error
+	}
 	return selectCart, nil
 }
 
@@ -23,9 +23,9 @@ func GetHistoryOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	// if query.RowsAffected == 0 {
-	// 	return 0, query.Error
-	// }
+	if query.RowsAffected == 0 {
+		return 0, query.Error
+	}
 	return selectCart, nil
 }
 
@@ -34,13 +34,13 @@ func GetCancelOrder(id int) (interface{}, error) {
 	if query.Error != nil {
 		return nil, query.Error
 	}
-	// if query.RowsAffected == 0 {
-	// 	return 0, query.Error
-	// }
+	if query.RowsAffected == 0 {
+		return 0, query.Error
+	}
 	return selectCart, nil
 }
 
-func CreateOrder(order models.Orders) (interface{}, error) {
+func CreateOrder(order models.Order_Details) (interface{}, error) {
 	query := config.DB.Save(&order)
 	if query.Error != nil {
 		return nil, query.Error
