@@ -18,9 +18,9 @@ func GetAllOrderController(c echo.Context) error {
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order"))
 	}
-	// if order == 0 {
-	// 	return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
-	// }
+	if order == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get order by user id", order))
 }
 
@@ -32,9 +32,9 @@ func GetHistoryOrderController(c echo.Context) error {
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch history order"))
 	}
-	// if order == 0 {
-	// 	return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
-	// }
+	if order == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get order by user id", order))
 }
 
@@ -46,16 +46,16 @@ func GetCancelOrderController(c echo.Context) error {
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch cancel order"))
 	}
-	// if order == 0 {
-	// 	return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
-	// }
+	if order == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get cancel order by user id", order))
 }
 
 // Controller untuk memasukkan barang baru ke shopping cart
 func CreateOrderController(c echo.Context) error {
 	// Mendapatkan data shopping carts baru dari client
-	input := models.Orders{}
+	input := models.Order_Details{}
 	c.Bind(&input)
 	// Menyimpan data barang baru menggunakan fungsi CreateOrder
 	order, e := database.CreateOrder(input)
