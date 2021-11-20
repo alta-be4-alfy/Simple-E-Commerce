@@ -110,15 +110,3 @@ func AddQtyPrice(id int) {
 	config.DB.Exec("UPDATE orders SET total_price = (SELECT SUM(price) FROM order_details WHERE orders_id =?) WHERE id =?", id, id)
 	config.DB.Exec("UPDATE orders SET total_qty = (SELECT SUM(qty) FROM order_details WHERE orders_id =?) WHERE id =?", id, id)
 }
-
-// Fungsi untuk menghapus satu data product berdasarkan id product
-func DeleteShoppingCart(id int) (interface{}, error) {
-	query := config.DB.Delete(&models.Shopping_Carts{}, id)
-	if query.Error != nil {
-		return nil, query.Error
-	}
-	if query.RowsAffected == 0 {
-		return 0, query.Error
-	}
-	return "deleted", nil
-}
