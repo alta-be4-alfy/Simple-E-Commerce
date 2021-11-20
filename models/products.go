@@ -9,7 +9,7 @@ type Products struct {
 	Product_Stock       int              `json:"product_stock" form:"product_stock"`
 	Product_Price       int              `json:"product_price" form:"product_price"`
 	Product_Description string           `json:"product_description" form:"product_description"`
-	UsersID             int              `gorm:"default:1" json:"users_id" form:"users_id"`
+	UsersID             int              `json:"users_id" form:"users_id"`
 	Shopping_Carts      []Shopping_Carts `gorm:"foreignKey:ProductsID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 

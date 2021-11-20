@@ -20,9 +20,14 @@ func CreateProduct(id int) (int, error) {
 // Fungsi untuk mendapatkan seluruh data products
 func GetProducts() (interface{}, error) {
 	var products []models.ProductResponse
-	query := config.DB.Table("products").Select("*").Joins("join users on users.id = products.users_id").Find(&products)
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
+	}
+	if query.RowsAffected == 0 {
+		return 0, nil
 	}
 	return products, nil
 }
@@ -30,7 +35,9 @@ func GetProducts() (interface{}, error) {
 // Fungsi untuk mendapatkan satu data product berdasarkan id product
 func GetProduct(id int) (interface{}, error) {
 	var product models.ProductResponse
-	query := config.DB.Table("products").Select("*").Joins("join users on users.id = products.users_id").Where("products.id = ?", id).Find(&product)
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Where("products.id = ?", id).Find(&product)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -53,7 +60,9 @@ func GetProductOwner(id int) (int, error) {
 // Fungsi untuk mendapatkan seluruh data product product tertentu berdasarkan id user
 func GetUserProducts(id int) (interface{}, error) {
 	var products []models.ProductResponse
-	query := config.DB.Table("products").Select("*").Joins("join users on users.id = products.users_id").Where("users.id = ?", id).Find(&products)
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Where("users.id = ?", id).Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
 	}

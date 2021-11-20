@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	// "bytes"
-
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -174,7 +172,7 @@ func TestGetProductsControllerSuccess(t *testing.T) {
 				assert.Error(t, err, "error")
 			}
 			assert.Equal(t, testCases[index].ExpectSize, len(responses.Data))
-			assert.Equal(t, "failed", responses.Status)
+			assert.Equal(t, "success", responses.Status)
 		}
 	}
 }
@@ -192,6 +190,34 @@ func TestGetProductsControllerFailed(t *testing.T) {
 
 	// Melakukan penghapusan tabel untuk membuat request failed
 	config.DB.Migrator().DropTable(&models.Products{})
+
+	req := httptest.NewRequest(http.MethodGet, "/products", nil)
+	rec := httptest.NewRecorder()
+	context := e.NewContext(req, rec)
+
+	context.SetPath(testCases.Path)
+	GetProductsController(context)
+
+	body := rec.Body.String()
+	var responses ProductsResponseFailed
+	er := json.Unmarshal([]byte(body), &responses)
+	assert.Equal(t, testCases.ExpectCode, rec.Code)
+	if er != nil {
+		assert.Error(t, er, "error")
+	}
+	assert.Equal(t, "failed", responses.Status)
+}
+
+// Fungsi untuk melakukan testing fungsi GetProductsController
+// kondisi request failed
+func TestGetProductsControllerNoProduct(t *testing.T) {
+	var testCases = ProductsTestCase{
+		Name:       "products not found",
+		Path:       "/products",
+		ExpectCode: http.StatusBadRequest,
+	}
+
+	e := InitEchoTestAPI()
 
 	req := httptest.NewRequest(http.MethodGet, "/products", nil)
 	rec := httptest.NewRecorder()
@@ -254,7 +280,7 @@ func TestCreateProductControllerSuccess(t *testing.T) {
 	}
 	t.Run("POST /jwt/products", func(t *testing.T) {
 		assert.Equal(t, testCases.ExpectCode, rec.Code)
-		assert.Equal(t, "failed", product.Status)
+		assert.Equal(t, "success", product.Status)
 	})
 }
 
@@ -453,6 +479,7 @@ func TestDeleteProductControllerSuccess(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
 	InsertMockDataProductsToDB()
 	req := httptest.NewRequest(http.MethodDelete, "/products/:id", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -521,7 +548,7 @@ func TestDeleteProductControllerFailedChar(t *testing.T) {
 // kondisi request failed
 func TestDeleteProductControllerWrongId(t *testing.T) {
 	var testCases = ProductsTestCase{
-		Name:       "wrong id",
+		Name:       "product not found",
 		Path:       "/products/:id",
 		ExpectCode: http.StatusBadRequest,
 	}
@@ -585,49 +612,6 @@ func TestDeleteProductControllerFailed(t *testing.T) {
 	context.SetPath(testCases.Path)
 	context.SetParamNames("id")
 	context.SetParamValues("1")
-	middleware.JWT([]byte(constants.SECRET_JWT))(DeleteProductControllerTesting())(context)
-
-	var response ProductsResponseFailed
-	res_body := res.Body.String()
-	er := json.Unmarshal([]byte(res_body), &response)
-	if er != nil {
-		assert.Error(t, er, "error")
-	}
-	t.Run("DELETE /jwt/products/:id", func(t *testing.T) {
-		assert.Equal(t, testCases.ExpectCode, res.Code)
-		assert.Equal(t, "failed", response.Status)
-	})
-}
-
-// Fungsi untuk melakukan testing fungsi UpdateProductController menggunakan JWT
-// kondisi request failed
-func TestDeleteProductControllerNotAllowed(t *testing.T) {
-	var testCases = ProductsTestCase{
-		Name:       "not allowed delete one data product",
-		Path:       "/products/:id",
-		ExpectCode: http.StatusBadRequest,
-	}
-
-	e := InitEchoTestAPI()
-	// Mendapatkan token
-	token, err := UsingJWT()
-	if err != nil {
-		panic(err)
-	}
-
-	InsertMockDataUpdateUsersToDB()
-	InsertMockDataProductsToDB()
-	InsertMockDataUpdateProductsToDB()
-
-	req := httptest.NewRequest(http.MethodDelete, "/products/:id", nil)
-	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	res := httptest.NewRecorder()
-	context := e.NewContext(req, res)
-	context.SetPath(testCases.Path)
-	// Membuat userID pada productID berbeda dengan userID token untuk membuat request failed
-	context.SetParamNames("id")
-	context.SetParamValues("2")
 	middleware.JWT([]byte(constants.SECRET_JWT))(DeleteProductControllerTesting())(context)
 
 	var response ProductsResponseFailed
