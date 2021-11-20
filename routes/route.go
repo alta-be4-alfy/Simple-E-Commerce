@@ -2,7 +2,7 @@ package routes
 
 import (
 	"project1/constants"
-	"project1/controllers"
+	controllers "project1/controllers"
 
 	"github.com/labstack/echo/v4"
 	echoMid "github.com/labstack/echo/v4/middleware"
