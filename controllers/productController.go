@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 	"project1/lib/database"
 	responses "project1/lib/response"
@@ -17,9 +16,13 @@ func CreateProductController(c echo.Context) error {
 	// Mendapatkan data product baru dari client
 	input := models.Products{}
 	c.Bind(&input)
-
 	// Menyimpan data buku baru menggunakan fungsi CreateProduct
-	product, e := database.CreateProduct(input)
+	idUser := middlewares.ExtractTokenUserId(c)
+	idProduct, e := database.CreateProduct(idUser)
+	if e != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create product"))
+	}
+	product, e := database.UpdateProduct(idProduct, &input)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create product"))
 	}
@@ -79,33 +82,25 @@ func UpdateProductController(c echo.Context) error {
 
 	// Pengecekan apakah id product memiliki id user yang sama dengan id token
 	idToken := middlewares.ExtractTokenUserId(c)
-	getProduct, err := database.GetProduct(id)
+	idOwner, err := database.GetProductOwner(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("owner product not found"))
 	}
-	if getProduct == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
+	if idOwner != idToken {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("not allowed to update"))
 	}
-	getProductJSON, err := json.Marshal(getProduct)
-	if err != nil {
-		panic(err)
-	}
-	var responseGetProduct models.Products
-	json.Unmarshal([]byte(getProductJSON), &responseGetProduct)
-
-	if responseGetProduct.UsersID != idToken {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("not allowed to delete"))
-	}
-
 	// Mendapatkan data product yang akan diperbaharui dari client
 	var updatedProduct models.Products
 	c.Bind(&updatedProduct)
 	// Memperbaharui data menggunakan fungsi UpdateProduct
-	product, er := database.UpdateProduct(id, &updatedProduct)
-	if er != nil {
+	if _, er := database.UpdateProduct(id, &updatedProduct); er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to update product"))
 	}
-	return c.JSON(http.StatusOK, responses.StatusSuccessData("update success", product))
+	updateProduct, er := database.GetProduct(id)
+	if er != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch updated product"))
+	}
+	return c.JSON(http.StatusOK, responses.StatusSuccessData("update success", updateProduct))
 }
 
 // Controller untuk menghapus satu data product berdasarkan id product
@@ -115,27 +110,15 @@ func DeleteProductController(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("false param"))
 	}
-
 	// Pengecekan apakah id product memiliki id user yang sama dengan id token
 	idToken := middlewares.ExtractTokenUserId(c)
-	getProduct, err := database.GetProduct(id)
+	idOwner, err := database.GetProductOwner(id)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("owner product not found"))
 	}
-	if getProduct == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product id not found"))
-	}
-	getProductJSON, err := json.Marshal(getProduct)
-	if err != nil {
-		panic(err)
-	}
-	var responseProduct models.Products
-	json.Unmarshal([]byte(getProductJSON), &responseProduct)
-
-	if responseProduct.UsersID != idToken {
+	if idOwner != idToken {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("not allowed to delete"))
 	}
-
 	// Mengapus data satu product menggunakan fungsi DeleteProduct
 	if _, e := database.DeleteProduct(id); e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to delete product"))

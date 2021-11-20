@@ -28,6 +28,7 @@ func InitMigrate() {
 	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Products{})
 	DB.AutoMigrate(&models.Shopping_Carts{})
+	DB.AutoMigrate(&models.Order_Details{})
 }
 
 // Inisiasi koneksi ke database untuk melakukan unit testing

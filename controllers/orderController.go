@@ -19,7 +19,7 @@ func GetAllOrderController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order"))
 	}
 	if order == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("order not found"))
 	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get order by user id", order))
 }
@@ -33,7 +33,7 @@ func GetHistoryOrderController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch history order"))
 	}
 	if order == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("order not found"))
 	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get order by user id", order))
 }
@@ -47,7 +47,7 @@ func GetCancelOrderController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch cancel order"))
 	}
 	if order == 0 {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("user id not found"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("order not found"))
 	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success get cancel order by user id", order))
 }
@@ -63,4 +63,35 @@ func CreateOrderController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to add order"))
 	}
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create order", order))
+}
+
+func CreateOrderDetailController(c echo.Context) error {
+	// Mendapatkan data order id dan shopping id dari client
+	input := models.Order_Details{}
+	c.Bind(&input)
+	// Memasukkan data ke order detail
+	orderDetail, er := database.CreateOrderDetail(input)
+	if er != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create new order detail"))
+	}
+	// Input data shopping cart ke order detail
+	cartItem, er := database.GetCartItem(orderDetail.Shopping_CartsID)
+	if er != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
+	}
+
+	insertCart := models.Order_Details{
+		Qty:        cartItem.Qty,
+		Price:      cartItem.Price,
+		UsersID:    cartItem.UsersID,
+		ProductsID: cartItem.ProductsID,
+	}
+
+	cart, er := database.InsertOrderDetail(insertCart, int(orderDetail.ID))
+	if er != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
+	}
+	database.AddQtyPrice(orderDetail.OrdersID)
+
+	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", cart))
 }

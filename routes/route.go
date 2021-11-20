@@ -29,5 +29,6 @@ func New() *echo.Echo {
 	r.GET("/orders/history", controllers.GetHistoryOrderController)
 	r.GET("/orders/cancel", controllers.GetCancelOrderController)
 	r.POST("/orders", controllers.CreateOrderController)
+	r.POST("/orders/detail", controllers.CreateOrderDetailController)
 	return e
 }
