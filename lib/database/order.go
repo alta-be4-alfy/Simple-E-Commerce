@@ -74,7 +74,7 @@ func CreateOrder(order models.Orders) (interface{}, error) {
 	}
 }
 
-// Fungsi untuk membuat order detail
+// Fungsi untuk membuat order detail baru
 func CreateOrderDetail(orderDetail models.Order_Details) (models.Order_Details, error) {
 	query := config.DB.Save(&orderDetail)
 	if query.Error != nil {
@@ -83,6 +83,18 @@ func CreateOrderDetail(orderDetail models.Order_Details) (models.Order_Details, 
 	return orderDetail, nil
 }
 
+// Fungsi untuk mendapatkan beberapa item dari shopping cart
+func GetCartItem(id int) (models.CartItem, error) {
+	var shoppingCart models.Shopping_Carts
+	var cartItem models.CartItem
+	query := config.DB.Model(&shoppingCart).Find(&cartItem)
+	if query.Error != nil {
+		return cartItem, query.Error
+	}
+	return cartItem, nil
+}
+
+// Fungsi untuk memasukkan data shopping cart ke order detail
 func InsertOrderDetail(updateOrder models.Order_Details, id int) (interface{}, error) {
 	var orderDetail models.Order_Details
 	query := config.DB.Find(&orderDetail, id)
@@ -94,16 +106,6 @@ func InsertOrderDetail(updateOrder models.Order_Details, id int) (interface{}, e
 		return nil, query.Error
 	}
 	return orderDetail, nil
-}
-
-func GetCartItem(id int) (models.CartItem, error) {
-	var shoppingCart models.Shopping_Carts
-	var cartItem models.CartItem
-	query := config.DB.Model(&shoppingCart).Find(&cartItem)
-	if query.Error != nil {
-		return cartItem, query.Error
-	}
-	return cartItem, nil
 }
 
 func AddQtyPrice(id int) {

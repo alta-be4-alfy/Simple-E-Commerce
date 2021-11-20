@@ -13,7 +13,7 @@ import (
 func GetAllOrderController(c echo.Context) error {
 	// Mendapatkan id user dari token
 	idUser := middlewares.ExtractTokenUserId(c)
-	// Mendapatkan data seluruh order user tertentu menggunakan fungsi GetUserorder
+	// Mendapatkan data seluruh order user tertentu menggunakan fungsi GetAllOrder
 	order, e := database.GetAllOrder(idUser)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order"))
@@ -27,7 +27,7 @@ func GetAllOrderController(c echo.Context) error {
 func GetHistoryOrderController(c echo.Context) error {
 	// Mendapatkan id user dari token
 	idUser := middlewares.ExtractTokenUserId(c)
-	// Mendapatkan data seluruh order user tertentu menggunakan fungsi GetUserorder
+	// Mendapatkan data seluruh history order user tertentu menggunakan fungsi GetHistoryOrder
 	order, e := database.GetHistoryOrder(idUser)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch history order"))
@@ -41,7 +41,7 @@ func GetHistoryOrderController(c echo.Context) error {
 func GetCancelOrderController(c echo.Context) error {
 	// Mendapatkan id user dari token
 	idUser := middlewares.ExtractTokenUserId(c)
-	// Mendapatkan data seluruh order user tertentu menggunakan fungsi GetUserorder
+	// Mendapatkan data seluruh order yang di cancel user tertentu menggunakan fungsi GetCancelOrder
 	order, e := database.GetCancelOrder(idUser)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch cancel order"))
@@ -74,7 +74,7 @@ func CreateOrderDetailController(c echo.Context) error {
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create new order detail"))
 	}
-	// Input data shopping cart ke order detail
+	// Mendapatkan data shopping cart
 	cartItem, er := database.GetCartItem(orderDetail.Shopping_CartsID)
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
@@ -86,11 +86,12 @@ func CreateOrderDetailController(c echo.Context) error {
 		UsersID:    cartItem.UsersID,
 		ProductsID: cartItem.ProductsID,
 	}
-
+	// Memasukkan data shopping cart ke order detail
 	cart, er := database.InsertOrderDetail(insertCart, int(orderDetail.ID))
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
 	}
+	// Input jumlah qty dan jumlah harga order id tertentu ke dalam tabel orders
 	database.AddQtyPrice(orderDetail.OrdersID)
 
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", cart))
