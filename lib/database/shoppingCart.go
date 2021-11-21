@@ -16,7 +16,7 @@ type Select struct {
 // Fungsi untuk menambahkan harga berdasarkan qty
 func AddQtyPrice(products_id, id int) {
 	config.DB.Table("shopping_carts").Joins("join products on products.id = shopping_carts.products_id")
-	config.DB.Exec("UPDATE shopping_carts SET price = ((SELECT product_price FROM products WHERE products.id =?)*shopping_carts.qty) WHERE shopping_carts.id =?", products_id, id)
+	config.DB.Exec("UPDATE shopping_carts SET price = (SELECT product_price FROM products WHERE products.id =?) WHERE shopping_carts.id =?", products_id, id)
 }
 
 // Fungsi untuk mendapatkan seluruh data shopping carts
