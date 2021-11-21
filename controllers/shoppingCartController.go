@@ -30,13 +30,21 @@ func GetShoppingCartsController(c echo.Context) error {
 func CreateShoppingCartsController(c echo.Context) error {
 	// Mendapatkan data shopping carts baru dari client
 	input := models.Shopping_Carts{}
+	idToken := middlewares.ExtractTokenUserId(c)
 	c.Bind(&input)
+	if input.UsersID != idToken {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("Wrong Users ID"))
+	}
+	if input.Qty <= 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("Must Add product"))
+	}
 	// Menyimpan data barang baru menggunakan fungsi CreateShoppingCarts
 	shoppingCart, e := database.CreateShoppingCarts(input)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to add cart"))
 	}
-	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create shopping cart", shoppingCart))
+	database.AddQtyPrice(input.ProductsID, int(shoppingCart.ID))
+	return c.JSON(http.StatusOK, responses.StatusSuccess("success to create shopping cart"))
 }
 
 // Fungsi untuk memperbaharui satu data product berdasarkan id product

@@ -66,7 +66,6 @@ var (
 		Order_Status:      "pending",
 		AddressID:         1,
 		Payment_MethodsID: 1,
-		Shopping_CartsID:  1,
 	}
 	mock_data_address_shoppingcart = models.Address{
 		Street:   "Dahlia",
@@ -78,7 +77,6 @@ var (
 		Qty:        1,
 		Price:      1,
 		ProductsID: 1,
-		OrdersID:   1,
 		UsersID:    1,
 	}
 	mock_data_user_shoppingcart = models.Users{
