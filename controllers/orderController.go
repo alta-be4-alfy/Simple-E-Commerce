@@ -74,6 +74,10 @@ func CreateOrderDetailController(c echo.Context) error {
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create new order detail"))
 	}
+	// Input jumlah qty dan jumlah harga order id tertentu ke dalam tabel orders
+	database.AddQtyPricetoOrderDetail(input.Shopping_CartsID)
+	database.AddQtyPricetoOrder(input.OrdersID)
+
 	order, er := database.GetOrderDetail(int(orderDetail.ID))
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order detail"))
@@ -81,8 +85,6 @@ func CreateOrderDetailController(c echo.Context) error {
 	if order == 0 {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order detail"))
 	}
-	// Input jumlah qty dan jumlah harga order id tertentu ke dalam tabel orders
-	database.AddQtyPrice(input.OrdersID)
 
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", order))
 }
