@@ -18,7 +18,7 @@ func New() *echo.Echo {
 
 	r := e.Group("/jwt")
 	r.Use(echoMid.JWT([]byte(constants.SECRET_JWT)))
-	r.GET("/users/:id", controllers.GetAllUsersController)   // jwt
+	r.GET("/users/:id", controllers.GetUsersController)      //jwt
 	r.DELETE("/users/:id", controllers.DeleteUserController) // jwt delete
 	r.PUT("/users/:id", controllers.UpdateUserController)    // jwt put
 	r.GET("/products/users", controllers.GetUserProductController)
@@ -29,6 +29,10 @@ func New() *echo.Echo {
 	r.GET("/orders/history", controllers.GetHistoryOrderController)
 	r.GET("/orders/cancel", controllers.GetCancelOrderController)
 	r.POST("/orders", controllers.CreateOrderController)
+	r.GET("/shopping_carts", controllers.GetShoppingCartsController)
+	r.POST("/shopping_carts", controllers.CreateShoppingCartsController)
+	r.PUT("/shopping_carts/:id", controllers.UpdateShoppingCartsController)
+	r.DELETE("/shopping_carts/:id", controllers.DeleteShoppingCartController)
 	r.POST("/orders/detail", controllers.CreateOrderDetailController)
 	return e
 }
