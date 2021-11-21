@@ -41,14 +41,10 @@ $ go run main.go
 
 
 # Our Feature
-* CREATE
-- Fitur CREATE ini mencakup tabel User, Shopping Cart, Order, dan Product.
-* READ
-- Fitur READ ini mencakup tabel User, Shopping Cart, Order, dan Product.
-* UPDATE
-- Fitur UPDATE ini mencakup tabel User, Shopping Cart, dan Product.
-* DELETE
-- Fitur DELETE ini mencakup tabel User, Shopping Cart, dan Product.
+* CREATE : User, Shopping Cart, Order, dan Product.
+* READ : User, Shopping Cart, Order, dan Product.
+* UPDATE User, Shopping Cart, dan Product.
+* DELETE : User, Shopping Cart, dan Product.
 
 
 # Structuring
