@@ -101,6 +101,6 @@ func CreateOrderDetail(orderDetail models.Order_Details) (models.Order_Details, 
 }
 
 func AddQtyPrice(id int) {
-	config.DB.Exec("UPDATE orders SET total_price = (SELECT SUM(price) FROM order_details WHERE orders_id =?) WHERE id =?", id, id)
-	config.DB.Exec("UPDATE orders SET total_qty = (SELECT SUM(qty) FROM order_details WHERE orders_id =?) WHERE id =?", id, id)
+	config.DB.Exec("UPDATE orders SET total_price = (SELECT SUM(shopping_carts.price) FROM order_details JOIN shopping_carts ON order_details.shopping_carts_id = shopping_carts.id WHERE order_details.orders_id =?) WHERE id =?", id, id)
+	config.DB.Exec("UPDATE orders SET total_qty = (SELECT SUM(shopping_carts.qty) FROM order_details JOIN shopping_carts ON order_details.shopping_carts_id = shopping_carts.id WHERE order_details.orders_id =?) WHERE id =?", id, id)
 }
