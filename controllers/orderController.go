@@ -55,7 +55,7 @@ func GetCancelOrderController(c echo.Context) error {
 // Controller untuk memasukkan barang baru ke shopping cart
 func CreateOrderController(c echo.Context) error {
 	// Mendapatkan data shopping carts baru dari client
-	input := models.Order_Details{}
+	input := models.Orders{}
 	c.Bind(&input)
 	// Menyimpan data barang baru menggunakan fungsi CreateOrder
 	order, e := database.CreateOrder(input)
@@ -82,7 +82,7 @@ func CreateOrderDetailController(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order detail"))
 	}
 	// Input jumlah qty dan jumlah harga order id tertentu ke dalam tabel orders
-	database.AddQtyPrice(input.OrdersID)
+	database.AddQtyPricetoOrder(input.OrdersID)
 
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", order))
 }
