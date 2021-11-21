@@ -101,8 +101,9 @@ $ go run main.go
 | POST  | /register | Register a new user | No | No
 | POST | /login | Login existing user| No | No
 |---|---|---|---|---|
-| GET    | /users | Get list of all user | Yes | Yes
-| PUT | /users | Update user profile | Yes | Yes
+| GET    | /users/:id | Get list of all user | Yes | Yes
+| PUT | /users/:id | Update user profile | Yes | Yes
+| DELETE | /users/:id | Delete user profile | Yes | Yes
 |---|---|---|---|---|
 | POST   | /products | Add products | Yes | Yes
 | GET   | /products | Get products list | Yes | Yes
