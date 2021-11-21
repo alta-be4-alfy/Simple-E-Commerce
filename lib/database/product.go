@@ -5,48 +5,69 @@ import (
 	"project1/models"
 )
 
-// Fungsi untuk membuat data products baru
-func CreateProduct(product models.Products) (interface{}, error) {
-	query := config.DB.Save(&product)
-	if query.Error != nil {
-		return nil, query.Error
-	} else {
-		return product, nil
+// Fungsi untuk memasukkan id user pada product yang baru dibuat
+func CreateProduct(id int) (int, error) {
+	productUser := models.Products{
+		UsersID: id,
 	}
+	query := config.DB.Select("UsersID").Create(&productUser)
+	if query.Error != nil {
+		return 0, query.Error
+	}
+	return int(productUser.ID), nil
 }
 
 // Fungsi untuk mendapatkan seluruh data products
 func GetProducts() (interface{}, error) {
-	var products []models.Products
-	query := config.DB.Find(&products)
+	var products []models.ProductResponse
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
+	}
+	if query.RowsAffected == 0 {
+		return 0, nil
 	}
 	return products, nil
 }
 
 // Fungsi untuk mendapatkan satu data product berdasarkan id product
 func GetProduct(id int) (interface{}, error) {
-	var product models.Products
-	query := config.DB.Find(&product, id)
+	var product models.ProductResponse
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Where("products.id = ?", id).Find(&product)
 	if query.Error != nil {
 		return nil, query.Error
 	}
 	if query.RowsAffected == 0 {
-		return 0, query.Error
+		return 0, nil
 	}
 	return product, nil
 }
 
-// Fungsi untuk mendapatkan seluruh data product product tertentu berdasarkan id product
+// Fungsi untuk mendapatkan user id pemilik product
+func GetProductOwner(id int) (int, error) {
+	var product models.Products
+	query := config.DB.Find(&product, id)
+	if query.Error != nil {
+		return 0, nil
+	}
+	return product.UsersID, nil
+}
+
+// Fungsi untuk mendapatkan seluruh data product product tertentu berdasarkan id user
 func GetUserProducts(id int) (interface{}, error) {
-	var products []models.Products
-	query := config.DB.Find(&products, "users_id = ?", id)
+	var products []models.ProductResponse
+	query := config.DB.Table("products").Select(
+		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
+		"join users on users.id = products.users_id").Where("users.id = ?", id).Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
 	}
 	if query.RowsAffected == 0 {
-		return 0, query.Error
+		return 0, nil
 	}
 	return products, nil
 }
@@ -59,7 +80,7 @@ func UpdateProduct(id int, updateProduct *models.Products) (interface{}, error) 
 		return nil, query.Error
 	}
 	if query.RowsAffected == 0 {
-		return 0, query.Error
+		return 0, nil
 	}
 	updateQuery := config.DB.Model(&product).Updates(updateProduct)
 	if updateQuery.Error != nil {
@@ -75,7 +96,7 @@ func DeleteProduct(id int) (interface{}, error) {
 		return nil, query.Error
 	}
 	if query.RowsAffected == 0 {
-		return 0, query.Error
+		return 0, nil
 	}
 	return "deleted", nil
 }

@@ -25,9 +25,10 @@ func InitMigrate() {
 	DB.AutoMigrate(&models.Payment_Methods{})
 	DB.AutoMigrate(&models.Address{})
 	DB.AutoMigrate(&models.Users{})
-	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Products{})
+	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Shopping_Carts{})
+	DB.AutoMigrate(&models.Order_Details{})
 }
 
 // Inisiasi koneksi ke database untuk melakukan unit testing
@@ -46,6 +47,7 @@ func InitDBTest() {
 // Migrasi tabel untuk unit testing
 // Drop tabel dilakukan agar tabel selalu terinisiasi kembali setiap terbuhung ke database
 func InitiateMigrateTest() {
+	DB.Migrator().DropTable(&models.Order_Details{})
 	DB.Migrator().DropTable(&models.Shopping_Carts{})
 	DB.Migrator().DropTable(&models.Products{})
 	DB.Migrator().DropTable(&models.Orders{})
@@ -58,4 +60,5 @@ func InitiateMigrateTest() {
 	DB.AutoMigrate(&models.Orders{})
 	DB.AutoMigrate(&models.Products{})
 	DB.AutoMigrate(&models.Shopping_Carts{})
+	DB.AutoMigrate(&models.Order_Details{})
 }
