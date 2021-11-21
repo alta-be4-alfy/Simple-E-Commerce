@@ -26,6 +26,23 @@ func GetAllOrder(id int) (interface{}, error) {
 	return selectCart, nil
 }
 
+// Fungsi untuk mendapatkan seluruh order user tertentu
+func GetOrderDetail(idOrderDetail int) (interface{}, error) {
+	var orderDetail models.Order_DetailsResponse
+	query := config.DB.Table("order_details").Select(
+		"order_details.id,order_details.orders_id, order_details.shopping_carts_id, shopping_carts.qty,shopping_carts.price,products.product_name, users.user_name").Joins(
+		"join shopping_carts on order_details.shopping_carts_id = shopping_carts.id").Joins(
+		"join products on shopping_carts.products_id = products.id").Joins(
+		"join users on shopping_carts.users_id = users.id").Where("order_details.id = ?", idOrderDetail).Find(&orderDetail)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	if query.RowsAffected == 0 {
+		return 0, query.Error
+	}
+	return orderDetail, nil
+}
+
 // Fungsi untuk mendapatkan seluruh history order user tertentu
 func GetHistoryOrder(id int) (interface{}, error) {
 	query := config.DB.Table("orders").Select(
@@ -79,31 +96,6 @@ func CreateOrderDetail(orderDetail models.Order_Details) (models.Order_Details, 
 	query := config.DB.Save(&orderDetail)
 	if query.Error != nil {
 		return orderDetail, query.Error
-	}
-	return orderDetail, nil
-}
-
-// Fungsi untuk mendapatkan beberapa item dari shopping cart
-func GetCartItem(id int) (models.CartItem, error) {
-	var shoppingCart models.Shopping_Carts
-	var cartItem models.CartItem
-	query := config.DB.Model(&shoppingCart).Find(&cartItem)
-	if query.Error != nil {
-		return cartItem, query.Error
-	}
-	return cartItem, nil
-}
-
-// Fungsi untuk memasukkan data shopping cart ke order detail
-func InsertOrderDetail(updateOrder models.Order_Details, id int) (interface{}, error) {
-	var orderDetail models.Order_Details
-	query := config.DB.Find(&orderDetail, id)
-	if query.Error != nil {
-		return nil, query.Error
-	}
-	updateQuery := config.DB.Model(&orderDetail).Updates(updateOrder)
-	if updateQuery.Error != nil {
-		return nil, query.Error
 	}
 	return orderDetail, nil
 }

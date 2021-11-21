@@ -74,25 +74,15 @@ func CreateOrderDetailController(c echo.Context) error {
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to create new order detail"))
 	}
-	// Mendapatkan data shopping cart
-	cartItem, er := database.GetCartItem(orderDetail.Shopping_CartsID)
+	order, er := database.GetOrderDetail(int(orderDetail.ID))
 	if er != nil {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order detail"))
 	}
-
-	insertCart := models.Order_Details{
-		Qty:        cartItem.Qty,
-		Price:      cartItem.Price,
-		UsersID:    cartItem.UsersID,
-		ProductsID: cartItem.ProductsID,
-	}
-	// Memasukkan data shopping cart ke order detail
-	cart, er := database.InsertOrderDetail(insertCart, int(orderDetail.ID))
-	if er != nil {
-		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to move shopping cart item"))
+	if order == 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch order detail"))
 	}
 	// Input jumlah qty dan jumlah harga order id tertentu ke dalam tabel orders
-	database.AddQtyPrice(orderDetail.OrdersID)
+	database.AddQtyPrice(input.OrdersID)
 
-	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", cart))
+	return c.JSON(http.StatusOK, responses.StatusSuccessData("success to create new order", order))
 }
