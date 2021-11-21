@@ -60,22 +60,13 @@ var (
 		Product_Description: "5 in, 64GB",
 		UsersID:             1,
 	}
-	mock_data_order_shoppingcart = models.Orders{
-		Total_Qty:         1,
-		Total_Price:       1000,
-		Order_Status:      "pending",
-		AddressID:         1,
-		Payment_MethodsID: 1,
-	}
-	mock_data_address_shoppingcart = models.Address{
-		Street:   "Dahlia",
-		City:     "Bekasi",
-		Province: "West Java",
-		Zip:      17520,
-	}
 	mock_data_shopping_cart = models.Shopping_Carts{
 		Qty:        1,
-		Price:      1,
+		ProductsID: 1,
+		UsersID:    1,
+	}
+	mock_dataQty0_shopping_cart = models.Shopping_Carts{
+		Qty:        0,
 		ProductsID: 1,
 		UsersID:    1,
 	}
@@ -95,15 +86,6 @@ func InsertMockDataProductsShoppingCartToDB() error {
 	return nil
 }
 
-// Fungsi untuk memasukkan data address test ke dalam database
-func InsertMockDataAddressShoppingCartToDB() error {
-	query := config.DB.Save(&mock_data_address_shoppingcart)
-	if query.Error != nil {
-		return query.Error
-	}
-	return nil
-}
-
 // Fungsi untuk memasukkan data shopping cart test ke dalam database
 func InsertMockDataShoppingCartToDB() error {
 	query := config.DB.Save(&mock_data_shopping_cart)
@@ -112,10 +94,8 @@ func InsertMockDataShoppingCartToDB() error {
 	}
 	return nil
 }
-
-// Fungsi untuk memasukkan data order test ke dalam database
-func InsertMockDataOrdersShoppingCartToDB() error {
-	query := config.DB.Save(&mock_data_order_shoppingcart)
+func InsertMockDataQty0ShoppingCartToDB() error {
+	query := config.DB.Save(&mock_dataQty0_shopping_cart)
 	if query.Error != nil {
 		return query.Error
 	}
@@ -148,56 +128,64 @@ func UsingJWTCart() (string, error) {
 	return token, nil
 }
 
-// Fungsi testing CreateProductController
+// Fungsi testing CreateShoppingCartController
 func CreateShoppingCartsControllerTesting() echo.HandlerFunc {
 	return CreateShoppingCartsController
 }
 
-// Fungsi untuk melakukan testing fungsi CreateProductController menggunakan JWT
-// kondisi request success
-func TestCreateProductControllerSuccess(t *testing.T) {
-	var testCases = ShoppingCartsTestCase{
-		Name:       "success to create shopping cart",
-		Path:       "/shopping_carts",
-		ExpectCode: http.StatusOK,
-	}
+// Fungsi testing GetShoppingCartController
+func GetShoppingCartsControllerTesting() echo.HandlerFunc {
+	return GetShoppingCartsController
 
-	e := InitEchoTestShoppingCartAPI()
-
-	token, err := UsingJWTCart()
-	if err != nil {
-		panic(err)
-	}
-
-	body, err := json.Marshal(mock_data_shopping_cart)
-	if err != nil {
-		t.Error(t, err, "error")
-	}
-
-	// Mengirim data menggunakan request body dengan HTTP Method POST
-	req := httptest.NewRequest(http.MethodPost, "/shopping_carts", bytes.NewBuffer(body))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
-	rec := httptest.NewRecorder()
-	context := e.NewContext(req, rec)
-
-	middleware.JWT([]byte(constants.SECRET_JWT))(CreateShoppingCartsControllerTesting())(context)
-
-	bodyResponses := rec.Body.String()
-	var shoppingCart SingleShoppingCartsResponseSuccess
-
-	er := json.Unmarshal([]byte(bodyResponses), &shoppingCart)
-	if er != nil {
-		assert.Error(t, er, "error")
-	}
-	t.Run("POST /jwt/shopping_carts", func(t *testing.T) {
-		assert.Equal(t, testCases.ExpectCode, rec.Code)
-		assert.Equal(t, 1, shoppingCart.Data.Qty)
-	})
 }
 
 // Fungsi untuk melakukan testing fungsi CreateProductController menggunakan JWT
-// kondisi request failed
+// kondisi request success
+// func TestCreateShoppingCartControllerSuccess(t *testing.T) {
+// 	var testCases = ShoppingCartsTestCase{
+// 		Name:       "success to create shopping cart",
+// 		Path:       "/shopping_carts",
+// 		ExpectCode: http.StatusOK,
+// 	}
+
+// 	e := InitEchoTestShoppingCartAPI()
+// 	InsertMockDataUsersShoppingCartsToDB()
+// 	InsertMockDataProductsShoppingCartToDB()
+// 	InsertMockDataShoppingCartToDB()
+// 	token, err := UsingJWTCart()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	body, err := json.Marshal(mock_data_shopping_cart)
+// 	if err != nil {
+// 		t.Error(t, err, "error")
+// 	}
+
+// 	// Mengirim data menggunakan request body dengan HTTP Method POST
+// 	req := httptest.NewRequest(http.MethodPost, "/jwt/shopping_carts", bytes.NewBuffer(body))
+// 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+// 	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+// 	rec := httptest.NewRecorder()
+// 	context := e.NewContext(req, rec)
+
+// 	middleware.JWT([]byte(constants.SECRET_JWT))(CreateShoppingCartsControllerTesting())(context)
+
+// 	bodyResponses := rec.Body.String()
+// 	var shoppingCart SingleShoppingCartsResponseSuccess
+
+// 	er := json.Unmarshal([]byte(bodyResponses), &shoppingCart)
+// 	if er != nil {
+// 		assert.Error(t, er, "error")
+// 	}
+// 	t.Run("POST /jwt/shopping_carts", func(t *testing.T) {
+// 		assert.Equal(t, testCases.ExpectCode, rec.Code)
+// 		// assert.Equal(t, 1, shoppingCart.Data.Qty)
+// 	})
+// }
+
+// // Fungsi untuk melakukan testing fungsi CreateProductController menggunakan JWT
+// // kondisi request failed
 // func TestCreateProductControllerFailed(t *testing.T) {
 // 	var testCases = ShoppingCartsTestCase{
 // 		Name:       "failed to create shopping cart",
@@ -206,19 +194,22 @@ func TestCreateProductControllerSuccess(t *testing.T) {
 // 	}
 
 // 	e := InitEchoTestShoppingCartAPI()
+// 	InsertMockDataUsersShoppingCartsToDB()
+// 	InsertMockDataProductsShoppingCartToDB()
+// 	InsertMockDataQty0ShoppingCartToDB()
 
 // 	token, err := UsingJWTCart()
 // 	if err != nil {
 // 		panic(err)
 // 	}
-// 	body, err := json.Marshal(mock_data_shopping_cart)
+// 	body, err := json.Marshal(mock_dataQty0_shopping_cart)
 // 	if err != nil {
 // 		t.Error(t, err, "error")
 // 	}
 // 	// Menghapus tabel user untuk membuat request failed
 // 	config.DB.Migrator().DropTable(&models.Shopping_Carts{})
 
-// 	req := httptest.NewRequest(http.MethodPost, "/shopping_carts", bytes.NewBuffer(body))
+// 	req := httptest.NewRequest(http.MethodPost, "/jwt/shopping_carts", bytes.NewBuffer(body))
 // 	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
 // 	rec := httptest.NewRecorder()
 // 	context := e.NewContext(req, rec)
@@ -238,3 +229,98 @@ func TestCreateProductControllerSuccess(t *testing.T) {
 // 		assert.Equal(t, "failed", shoppingCart.Status)
 // 	})
 // }
+
+//Fungsi untuk melakukan testing fungsi GetProductsController
+// kondisi request success
+func TestGetShoppingCartControllerSuccess(t *testing.T) {
+	var testCases = []struct {
+		Name       string
+		Path       string
+		ExpectCode int
+		ExpectSize int
+	}{
+		{
+			Name:       "success to get all data shopping cart",
+			Path:       "/shopping_carts",
+			ExpectCode: http.StatusOK,
+			ExpectSize: 1,
+		},
+	}
+
+	e := InitEchoTestShoppingCartAPI()
+	token, err := UsingJWTCart()
+	if err != nil {
+		panic(err)
+	}
+	InsertMockDataUsersShoppingCartsToDB()
+	InsertMockDataProductsShoppingCartToDB()
+	InsertMockDataShoppingCartToDB()
+
+	req := httptest.NewRequest(http.MethodPost, "/jwt/shopping_carts", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+	rec := httptest.NewRecorder()
+	context := e.NewContext(req, rec)
+
+	middleware.JWT([]byte(constants.SECRET_JWT))(GetShoppingCartsControllerTesting())(context)
+	for index, testCase := range testCases {
+		context.SetPath(testCase.Path)
+		body := rec.Body.String()
+		var responses ShoppingCartsResponseSuccess
+		err := json.Unmarshal([]byte(body), &responses)
+		if err != nil {
+			assert.Error(t, err, "error")
+		}
+		t.Run("GET /jwt/shopping_carts", func(t *testing.T) {
+			assert.Equal(t, testCases[index].ExpectSize, len(responses.Data))
+			assert.Equal(t, "success", responses.Status)
+		})
+
+	}
+}
+
+// Fungsi untuk melakukan testing fungsi CreateProductController menggunakan JWT
+// kondisi request failed
+func TestGetShoppingCartControllerFailed(t *testing.T) {
+	var testCases = ShoppingCartsTestCase{
+		Name:       "failed to get shopping cart",
+		Path:       "/shopping_carts",
+		ExpectCode: http.StatusBadRequest,
+	}
+
+	e := InitEchoTestShoppingCartAPI()
+	InsertMockDataUsersShoppingCartsToDB()
+	InsertMockDataProductsShoppingCartToDB()
+	InsertMockDataShoppingCartToDB()
+
+	token, err := UsingJWTCart()
+	if err != nil {
+		panic(err)
+	}
+	body, err := json.Marshal(mock_data_shopping_cart)
+	if err != nil {
+		t.Error(t, err, "error")
+	}
+	// Menghapus tabel user untuk membuat request failed
+	config.DB.Migrator().DropTable(&models.Shopping_Carts{})
+
+	req := httptest.NewRequest(http.MethodPost, "/jwt/shopping_carts", bytes.NewBuffer(body))
+	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+	rec := httptest.NewRecorder()
+	context := e.NewContext(req, rec)
+	context.SetPath(testCases.Path)
+
+	// Call function on controller
+	middleware.JWT([]byte(constants.SECRET_JWT))(CreateShoppingCartsControllerTesting())(context)
+	bodyResponses := rec.Body.String()
+	var shoppingCart ShoppingCartsResponseFailed
+
+	er := json.Unmarshal([]byte(bodyResponses), &shoppingCart)
+	if er != nil {
+		assert.Error(t, er, "error")
+	}
+	t.Run("POST /jwt/shopping_carts", func(t *testing.T) {
+		assert.Equal(t, testCases.ExpectCode, rec.Code)
+		assert.Equal(t, "failed", shoppingCart.Status)
+	})
+}
