@@ -15,7 +15,7 @@ type Orders struct {
 
 type OrderResponse struct {
 	ID           uint
-	Total_Qty    int
+	Qty          int
 	Total_Price  int
 	Order_Status string
 	Payment      string
