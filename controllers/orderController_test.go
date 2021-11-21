@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"project1/config"
 	"project1/constants"
+	"project1/middlewares"
 
 	"project1/models"
 	"testing"
@@ -44,11 +45,11 @@ type OrdersTestCase struct {
 }
 
 // Fungsi untuk menginisiasi koneksi ke database test
-// func InitEchoTestAPI() *echo.Echo {
-// 	config.InitDBTest()
-// 	e := echo.New()
-// 	return e
-// }
+func InitEchoTestAPI() *echo.Echo {
+	config.InitDBTest()
+	e := echo.New()
+	return e
+}
 
 var (
 	mock_data_address = models.Address{
@@ -57,24 +58,24 @@ var (
 	mock_data_payment = models.Payment_Methods{
 		Payment: "OVO",
 	}
-	// mock_data_user = models.Users{
-	// 	User_Name: "alfa",
-	// 	Email:     "alfa@gmail.com",
-	// 	Password:  "inipwd",
-	// }
-	// mock_update_user = models.Users{
-	// 	User_Name: "ajjo",
-	// 	Email:     "ajjo@gmail.com",
-	// 	Password:  "itupwd",
-	// }
-	// mock_data_product = models.Products{
-	// 	Product_Name: "Android Mini",
-	// 	Product_Type: "Elektronik",
-	// 	Product_Stock: 3,
-	// 	Product_Price: 100000,
-	// 	Product_Description:"5 in, 64GB",
-	//  UsersID: 1,
-	// }
+	mock_data_user = models.Users{
+		User_Name: "alfa",
+		Email:     "alfa@gmail.com",
+		Password:  "inipwd",
+	}
+	mock_update_user = models.Users{
+		User_Name: "ajjo",
+		Email:     "ajjo@gmail.com",
+		Password:  "itupwd",
+	}
+	mock_data_product = models.Products{
+		Product_Name:        "Android Mini",
+		Product_Type:        "Elektronik",
+		Product_Stock:       3,
+		Product_Price:       100000,
+		Product_Description: "5 in, 64GB",
+		UsersID:             1,
+	}
 	mock_data_shoppingcart = models.Shopping_Carts{
 		Qty:        1,
 		Price:      100000,
@@ -92,7 +93,7 @@ var (
 	}
 )
 
-// Fungsi untuk memasukkan data order test ke dalam database
+// Fungsi untuk memasukkan data test ke dalam database
 func InsertMockDataToDB() {
 	config.DB.Save(&mock_data_address)
 	config.DB.Save(&mock_data_payment)
@@ -103,7 +104,7 @@ func InsertMockDataToDB() {
 	config.DB.Save(&mock_data_orderdetail)
 }
 
-// // Fungsi untuk memasukkan data update order test ke dalam database
+// // // Fungsi untuk memasukkan data update order test ke dalam database
 // func InsertMockDataUpdateOrdersToDB() error {
 // 	query := config.DB.Save(&mock_update_order)
 // 	if query.Error != nil {
@@ -113,21 +114,21 @@ func InsertMockDataToDB() {
 // }
 
 // Fungsi untuk melakukan login dan ekstraksi token JWT
-// func UsingJWT() (string, error) {
-// 	// Melakukan login data user test
-// 	InsertMockDataUsersToDB()
-// 	var user models.Users
-// 	tx := config.DB.Where("email = ? AND password = ?", mock_data_user.Email, mock_data_user.Password).First(&user)
-// 	if tx.Error != nil {
-// 		return "", tx.Error
-// 	}
-// 	// Mengektraksi token data user test
-// 	token, err := middlewares.CreateToken(int(user.ID))
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	return token, nil
-// }
+func UsingJWT() (string, error) {
+	// Melakukan login data user test
+	InsertMockDataToDB()
+	var user models.Users
+	tx := config.DB.Where("email = ? AND password = ?", mock_data_user.Email, mock_data_user.Password).First(&user)
+	if tx.Error != nil {
+		return "", tx.Error
+	}
+	// Mengektraksi token data user test
+	token, err := middlewares.CreateToken(int(user.ID))
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
 
 func GetAllOrderControllerTesting() echo.HandlerFunc {
 	return GetAllOrderController
@@ -157,7 +158,6 @@ func TestGetOrdersControllerSuccess(t *testing.T) {
 
 	middleware.JWT([]byte(constants.SECRET_JWT))(GetAllOrderControllerTesting())(context)
 	var responses SingleOrderResponseSuccess
-	assert.Equal(t, http.StatusOK, rec.Code)
 	body := rec.Body.String()
 	err = json.Unmarshal([]byte(body), &responses)
 	if err != nil {
@@ -169,64 +169,81 @@ func TestGetOrdersControllerSuccess(t *testing.T) {
 	})
 }
 
-// // Fungsi untuk melakukan testing fungsi GetOrdersController
-// // kondisi request failed
-// func TestGetOrdersControllerFailed(t *testing.T) {
-// 	var testCases = OrdersTestCase{
-// 		Name:       "failed to get all data orders",
-// 		Path:       "/orders",
-// 		ExpectCode: http.StatusBadRequest,
-// 	}
+// Fungsi untuk melakukan testing fungsi GetOrdersController
+// kondisi request failed
+func TestGetOrdersControllerFailed(t *testing.T) {
+	var testCases = OrdersTestCase{
+		Name:       "failed to get all data orders",
+		Path:       "/orders",
+		ExpectCode: http.StatusBadRequest,
+	}
 
-// 	e := InitEchoTestAPI()
+	e := InitEchoTestAPI()
+	token, err := UsingJWT()
+	if err != nil {
+		panic(err)
+	}
 
-// 	// Melakukan penghapusan tabel untuk membuat request failed
-// 	config.DB.Migrator().DropTable(&models.Orders{})
+	// Melakukan penghapusan tabel untuk membuat request failed
+	config.DB.Migrator().DropTable(&models.Orders{})
 
-// 	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
-// 	rec := httptest.NewRecorder()
-// 	context := e.NewContext(req, rec)
+	InsertMockDataToDB()
+	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+	rec := httptest.NewRecorder()
+	context := e.NewContext(req, rec)
+	context.SetPath(testCases.Path)
 
-// 	context.SetPath(testCases.Path)
-// 	GetOrdersController(context)
+	middleware.JWT([]byte(constants.SECRET_JWT))(GetAllOrderControllerTesting())(context)
+	var responses SingleOrderResponseSuccess
 
-// 	body := rec.Body.String()
-// 	var responses OrdersResponseFailed
-// 	er := json.Unmarshal([]byte(body), &responses)
-// 	assert.Equal(t, testCases.ExpectCode, rec.Code)
-// 	if er != nil {
-// 		assert.Error(t, er, "error")
-// 	}
-// 	assert.Equal(t, "failed", responses.Status)
-// }
+	body := rec.Body.String()
+	err = json.Unmarshal([]byte(body), &responses)
+	if err != nil {
+		assert.Error(t, err, "error")
+	}
+	t.Run("GET /jwt/orders", func(t *testing.T) {
+		assert.Equal(t, testCases.ExpectCode, rec.Code)
+		assert.Equal(t, "failed", responses.Status)
+	})
+}
 
-// // Fungsi untuk melakukan testing fungsi GetOrdersController
-// // kondisi request failed
-// func TestGetOrdersControllerNoOrder(t *testing.T) {
-// 	var testCases = OrdersTestCase{
-// 		Name:       "orders not found",
-// 		Path:       "/orders",
-// 		ExpectCode: http.StatusBadRequest,
-// 	}
+// Fungsi untuk melakukan testing fungsi GetOrdersController
+// kondisi request failed
+func TestGetOrdersControllerNoOrder(t *testing.T) {
+	var testCases = OrdersTestCase{
+		Name:       "orders not found",
+		Path:       "/orders",
+		ExpectCode: http.StatusBadRequest,
+	}
 
-// 	e := InitEchoTestAPI()
+	e := InitEchoTestAPI()
+	token, err := UsingJWT()
+	if err != nil {
+		panic(err)
+	}
 
-// 	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
-// 	rec := httptest.NewRecorder()
-// 	context := e.NewContext(req, rec)
+	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+	rec := httptest.NewRecorder()
+	context := e.NewContext(req, rec)
 
-// 	context.SetPath(testCases.Path)
-// 	GetOrdersController(context)
+	context.SetPath(testCases.Path)
+	middleware.JWT([]byte(constants.SECRET_JWT))(GetAllOrderControllerTesting())(context)
+	var responses SingleOrderResponseSuccess
 
-// 	body := rec.Body.String()
-// 	var responses OrdersResponseFailed
-// 	er := json.Unmarshal([]byte(body), &responses)
-// 	assert.Equal(t, testCases.ExpectCode, rec.Code)
-// 	if er != nil {
-// 		assert.Error(t, er, "error")
-// 	}
-// 	assert.Equal(t, "failed", responses.Status)
-// }
+	body := rec.Body.String()
+	err = json.Unmarshal([]byte(body), &responses)
+	if err != nil {
+		assert.Error(t, err, "error")
+	}
+	t.Run("GET /jwt/orders", func(t *testing.T) {
+		assert.Equal(t, testCases.ExpectCode, rec.Code)
+		assert.Equal(t, "failed", responses.Status)
+	})
+}
 
 // // Fungsi testing CreateOrderController
 // func CreateOrderControllerTesting() echo.HandlerFunc {

@@ -18,6 +18,9 @@ func CreateProductController(c echo.Context) error {
 	c.Bind(&input)
 	// Menyimpan data buku baru menggunakan fungsi CreateProduct
 	idUser := middlewares.ExtractTokenUserId(c)
+	if input.Product_Stock <= 0 {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed("product stock is empty"))
+	}
 	idProduct, e := database.CreateProduct(idUser)
 	if e != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to fetch product"))
