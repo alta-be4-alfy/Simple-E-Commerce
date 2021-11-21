@@ -2,7 +2,7 @@ package routes
 
 import (
 	"project1/constants"
-	"project1/controllers"
+	controllers "project1/controllers"
 
 	"github.com/labstack/echo/v4"
 	echoMid "github.com/labstack/echo/v4/middleware"
@@ -34,5 +34,6 @@ func New() *echo.Echo {
 	r.POST("/shopping_carts", controllers.CreateShoppingCartsController)
 	r.PUT("/shopping_carts/:id", controllers.UpdateShoppingCartsController)
 	r.DELETE("/shopping_carts/:id", controllers.DeleteShoppingCartController)
+	r.POST("/orders/detail", controllers.CreateOrderDetailController)
 	return e
 }
