@@ -22,7 +22,7 @@ func GetProducts() (interface{}, error) {
 	var products []models.ProductResponse
 	query := config.DB.Table("products").Select(
 		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
-		"join users on users.id = products.users_id").Find(&products)
+		"join users on users.id = products.users_id").Where("products.deleted_at IS NULL").Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -37,7 +37,7 @@ func GetProduct(id int) (interface{}, error) {
 	var product models.ProductResponse
 	query := config.DB.Table("products").Select(
 		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
-		"join users on users.id = products.users_id").Where("products.id = ?", id).Find(&product)
+		"join users on users.id = products.users_id").Where("products.id = ? AND products.deleted_at IS NULL", id).Find(&product)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -62,7 +62,7 @@ func GetUserProducts(id int) (interface{}, error) {
 	var products []models.ProductResponse
 	query := config.DB.Table("products").Select(
 		"products.id, products.product_name,products.product_type, products.product_stock, products.product_price, products.product_description, users.user_name").Joins(
-		"join users on users.id = products.users_id").Where("users.id = ?", id).Find(&products)
+		"join users on users.id = products.users_id").Where("users.id = ? AND products.deleted_at IS NULL", id).Find(&products)
 	if query.Error != nil {
 		return nil, query.Error
 	}
