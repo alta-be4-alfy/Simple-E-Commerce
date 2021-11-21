@@ -3,6 +3,8 @@ package controllers
 import (
 	"net/http"
 	"project1/lib/database"
+	responses "project1/lib/response"
+	"project1/middlewares"
 	"project1/models"
 	"strconv"
 
@@ -11,74 +13,60 @@ import (
 
 var user models.Users
 
-type M map[string]interface{}
+//register user
+func RegisterUsersController(c echo.Context) error {
+	c.Bind(&user)
+	duplicate, _ := database.GetUserByEmail(user.Email)
+	if duplicate > 0 {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Email was used, try another email",
+		})
+	}
+
+	Password, _ := database.GeneratehashPassword(user.Password)
+	user.Password = Password
+
+	_, err := database.RegisterUser(user)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success",
+	})
+}
 
 //login users
 func LoginUsersController(c echo.Context) error {
-	user := models.Users{}
+	user := models.UserLogin{}
 	c.Bind(&user)
-
 	users, err := database.LoginUsers(&user)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "Login failed",
-		})
-	}
-	return c.JSON(http.StatusOK, M{
-		"message": "Login success",
-		"users":   users,
-	})
-}
-
-// get all users
-func GetAllUsersController(c echo.Context) error {
-	users, err := database.GetAllUsers()
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "Bad Request",
-		})
-	}
-	return c.JSON(http.StatusOK, M{
-		"message": "Successful Operation",
-		"users":   users,
-	})
-}
-
-//create user by id
-func RegisterUsersController(c echo.Context) error {
-	c.Bind(&user)
-	user, err := database.RegisterUser(user)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Failed to create user",
-		})
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed)
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Success Create User",
-		"users":   user,
+		"message": "Login success",
+		"toket":   users.Token,
 	})
 }
 
 //get user by id
 func GetUsersController(c echo.Context) error {
-	c.Bind(&user)
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "False Param",
-		})
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed)
 	}
-	user, err := database.GetUser(id)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "Bad Request",
-			"users":   user,
-		})
+	loginuser := middlewares.ExtractTokenUserId(c)
+	if loginuser != id {
+		return c.JSON(http.StatusUnauthorized, responses.StatusFailedInternal)
 	}
-
-	return c.JSON(http.StatusOK, M{
-		"message": "Success get user",
-		"users":   user,
+	respon, e := database.GetUser(id)
+	if e != nil {
+		return c.JSON(http.StatusInternalServerError, responses.StatusFailedInternal)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success",
+		"data":    respon,
 	})
 }
 
@@ -86,19 +74,14 @@ func GetUsersController(c echo.Context) error {
 func DeleteUserController(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "False Param",
-		})
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed)
 	}
-	user, err := database.DeleteUser(id)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "Failed to delete user",
-			"users":   user,
-		})
+	_, error := database.DeleteUser(id)
+	if error != nil {
+		return c.JSON(http.StatusInternalServerError, responses.StatusFailed)
 	}
-	return c.JSON(http.StatusOK, M{
-		"message": "Success Delete User",
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success",
 	})
 }
 
@@ -107,19 +90,14 @@ func UpdateUserController(c echo.Context) error {
 	c.Bind(&user)
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "False Param",
-		})
+		return c.JSON(http.StatusBadRequest, responses.StatusFailed)
 	}
-	user, err := database.UpdateUser(id, user)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, M{
-			"message": "Bad Request",
-			"users":   user,
-		})
+	respon, e := database.UpdateUser(id, user)
+	if e != nil {
+		return c.JSON(http.StatusUnauthorized, responses.StatusFailedInternal)
 	}
-	return c.JSON(http.StatusOK, M{
-		"message": "Success get user",
-		"users":   user,
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success",
+		"data":    respon,
 	})
 }
