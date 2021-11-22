@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Address struct {
 	gorm.Model
-	Street   string   `json:"address" form:"address"`
+	Street   string   `json:"street" form:"street"`
 	City     string   `json:"city" form:"city"`
 	Province string   `json:"province" form:"province"`
 	Zip      int      `json:"zip" form:"zip"`
