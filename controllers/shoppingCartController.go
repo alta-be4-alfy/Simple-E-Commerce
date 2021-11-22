@@ -71,10 +71,10 @@ func UpdateShoppingCartsController(c echo.Context) error {
 		panic(err)
 	}
 
-	var responseGetShoppingCarts models.Shopping_Carts
-	json.Unmarshal([]byte(getShoppingCartJSON), &responseGetShoppingCarts)
+	var shoppingCarts models.Shopping_Carts
+	json.Unmarshal([]byte(getShoppingCartJSON), &shoppingCarts)
 
-	if responseGetShoppingCarts.UsersID != idToken {
+	if shoppingCarts.UsersID != idToken {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("not allowed to update"))
 	}
 
@@ -87,6 +87,7 @@ func UpdateShoppingCartsController(c echo.Context) error {
 	if er != nil {
 		return c.JSON(http.StatusBadRequest, responses.StatusFailed("failed to update shopping cart"))
 	}
+	database.AddQtyPrice(shoppingCarts.ProductsID, id)
 	return c.JSON(http.StatusOK, responses.StatusSuccessData("update success", shoppingCart))
 }
 
