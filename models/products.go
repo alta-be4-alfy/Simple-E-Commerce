@@ -12,3 +12,13 @@ type Products struct {
 	UsersID             int              `json:"users_id" form:"users_id"`
 	Shopping_Carts      []Shopping_Carts `gorm:"foreignKey:ProductsID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
+
+type ProductResponse struct {
+	ID                  uint
+	Product_Name        string
+	Product_Type        string
+	Product_Stock       int
+	Product_Price       int
+	Product_Description string
+	User_Name           string
+}

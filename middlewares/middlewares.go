@@ -20,7 +20,7 @@ func CreateToken(userId int) (string, error) {
 
 	claims["authorized"] = true
 	claims["userId"] = userId
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() // Token expires after 1 hour
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires after 1 hour
 
 	tokenString, err := token.SignedString([]byte(constants.SECRET_JWT))
 	if err != nil {

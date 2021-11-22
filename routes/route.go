@@ -2,7 +2,7 @@ package routes
 
 import (
 	"project1/constants"
-	"project1/controllers"
+	controllers "project1/controllers"
 
 	"github.com/labstack/echo/v4"
 	echoMid "github.com/labstack/echo/v4/middleware"
@@ -18,8 +18,7 @@ func New() *echo.Echo {
 
 	r := e.Group("/jwt")
 	r.Use(echoMid.JWT([]byte(constants.SECRET_JWT)))
-	r.GET("/users", controllers.GetAllUsersController)       // jwt
-	r.GET("/users/:id", controllers.GetUsersController)      // jwt
+	r.GET("/users/:id", controllers.GetUsersController)      //jwt
 	r.DELETE("/users/:id", controllers.DeleteUserController) // jwt delete
 	r.PUT("/users/:id", controllers.UpdateUserController)    // jwt put
 	r.GET("/products/users", controllers.GetUserProductController)
@@ -34,5 +33,6 @@ func New() *echo.Echo {
 	r.POST("/shopping_carts", controllers.CreateShoppingCartsController)
 	r.PUT("/shopping_carts/:id", controllers.UpdateShoppingCartsController)
 	r.DELETE("/shopping_carts/:id", controllers.DeleteShoppingCartController)
+	r.POST("/orders/detail", controllers.CreateOrderDetailController)
 	return e
 }
