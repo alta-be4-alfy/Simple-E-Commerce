@@ -60,9 +60,13 @@ var (
 		Payment: "OVO",
 	}
 	mock_data_user = models.Users{
-		User_Name: "alfa",
-		Email:     "alfa@gmail.com",
-		Password:  "inipwd",
+		User_Name:    "alfa",
+		Name:         "alfa",
+		Email:        "alfa@gmail.com",
+		Password:     "inipwd",
+		Gender:       "male",
+		Birth:        "1999-10-10",
+		Phone_Number: "23425365",
 	}
 	mock_data_product = models.Products{
 		Product_Name:        "Android Mini",
@@ -577,7 +581,11 @@ func TestCreateOrderDetailControllerSuccess(t *testing.T) {
 	}
 
 	e := InitEchoTestAPI()
-	InsertMockDataToDB()
+	config.DB.Save(&mock_data_address)
+	config.DB.Save(&mock_data_payment)
+	config.DB.Save(&mock_data_order)
+	config.DB.Save(&mock_data_product)
+	config.DB.Save(&mock_data_shoppingcart)
 
 	token, err := UsingJWT()
 	if err != nil {

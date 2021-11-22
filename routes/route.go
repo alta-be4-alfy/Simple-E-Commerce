@@ -33,6 +33,6 @@ func New() *echo.Echo {
 	r.POST("/shopping_carts", controllers.CreateShoppingCartsController)
 	r.PUT("/shopping_carts/:id", controllers.UpdateShoppingCartsController)
 	r.DELETE("/shopping_carts/:id", controllers.DeleteShoppingCartController)
-	r.POST("/orders/detail", controllers.CreateOrderDetailController)
+	// r.POST("/orders/detail", controllers.CreateOrderDetailController)
 	return e
 }
