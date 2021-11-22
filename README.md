@@ -106,26 +106,22 @@ $ go run main.go
 | DELETE | /users/:id | Delete user profile | Yes | Yes
 |---|---|---|---|---|
 | POST   | /products | Add products | Yes | Yes
-| GET   | /products | Get products list | Yes | Yes
-| DELETE   | /categories/:id | Delete category by id | Yes | Yes
+| GET   | /products | Get products list | No | No
+| GET   | /products/:id | Get products by id product | No | No
+| GET   | /products/users | Get products by userid | Yes | Yes
+| PUT | /products/:id | Update products by id products | Yes | Yes
+| DELETE   | /products/:id | Delete products by id products | Yes | Yes
 |---|---|---|---|---|
-| GET | /products | Get list of all products | No | No
-| GET | /products/:id | Get product by product id | No | No
-| POST | /products | Add products by admin | Yes | Yes
-| PUT | /products/:id | Update products by admin | Yes | Yes
-| DELETE | /products/:id | Delete products by admin | Yes | Yes
+| GET | /shopping_carts | Get list of all shopping carts | Yes | Yes
+| POST | /shopping_carts | Add shopping carts | Yes | Yes
+| PUT | /shopping_carts/:id | Update shopping carts by id products | Yes | Yes
+| DELETE | /shopping_carts/:id | Delete shopping_cart by id products | Yes | Yes
 |---|---|---|---|---|
-| POST | /carts | Add products to cart | Yes | Yes
-| GET | /carts | Get list of all cart item | Yes | Yes
-| PUT | /cartitems/:id | Update cart item by id | Yes | Yes
-| DELETE | /cartitems/:id | Delete cart item by id | Yes | Yes
-|---|---|---|---|---|
-| POST | /checkout | List of products checkout | Yes | Yes
-|---|---|---|---|---|
-| GET | /payments/:id | Get transaction status | Yes | Yes
-|---|---|---|---|---|
-| GET | /transactions | Get list of all transaction | Yes | Yes
-| GET | /transactionreport?range={range} | Get transactions with range date | Yes | Yes
+| POST | /orders | Add orders | Yes | Yes
+| POST | /orders | Add deatil orders | Yes | Yes
+| GET | /orders | Get list of all orders| Yes | Yes
+| GET | /history | Get list of all history| Yes | Yes
+| GET | /cancel | Get list of all cancel| Yes | Yes
 |---|---|---|---|---|
 
 <br>
