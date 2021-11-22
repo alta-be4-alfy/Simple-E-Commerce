@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Struct yang digunakan ketika test request success, dapat menampung banyak data
+// Struct yang digunakan ketika test request success, dapat menampung banyak dat
 type OrdersResponseSuccess struct {
 	Status  string
 	Message string
@@ -60,9 +60,13 @@ var (
 		Payment: "OVO",
 	}
 	mock_data_user = models.Users{
-		User_Name: "alfa",
-		Email:     "alfa@gmail.com",
-		Password:  "inipwd",
+		User_Name:    "alfa",
+		Name:         "alfa",
+		Email:        "alfa@gmail.com",
+		Password:     "inipwd",
+		Gender:       "male",
+		Birth:        `1999 - 10 - 10`,
+		Phone_Number: "9347993747",
 	}
 	mock_data_product = models.Products{
 		Product_Name:        "Android Mini",
@@ -100,19 +104,19 @@ func InsertMockDataToDB() {
 	config.DB.Save(&mock_data_orderdetail)
 }
 
-// // // Fungsi untuk memasukkan data update order test ke dalam database
-// func InsertMockDataUpdateOrdersToDB() error {
-// 	query := config.DB.Save(&mock_update_order)
-// 	if query.Error != nil {
-// 		return query.Error
-// 	}
-// 	return nil
-// }
+// // Fungsi untuk memasukkan data update order test ke dalam database
+func InsertMockDataUserToDB() error {
+	query := config.DB.Save(&mock_data_user)
+	if query.Error != nil {
+		return query.Error
+	}
+	return nil
+}
 
 // Fungsi untuk melakukan login dan ekstraksi token JWT
 func UsingJWT() (string, error) {
 	// Melakukan login data user test
-	config.DB.Save(&mock_data_user)
+	InsertMockDataUserToDB()
 	var user models.Users
 	tx := config.DB.Where("email = ? AND password = ?", mock_data_user.Email, mock_data_user.Password).First(&user)
 	if tx.Error != nil {
@@ -577,7 +581,11 @@ func TestCreateOrderDetailControllerSuccess(t *testing.T) {
 	}
 
 	e := InitEchoTestAPI()
-	InsertMockDataToDB()
+	config.DB.Save(&mock_data_address)
+	config.DB.Save(&mock_data_payment)
+	config.DB.Save(&mock_data_order)
+	config.DB.Save(&mock_data_product)
+	config.DB.Save(&mock_data_shoppingcart)
 
 	token, err := UsingJWT()
 	if err != nil {
