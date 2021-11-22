@@ -10,7 +10,7 @@ COPY ./go.sum ./
 # jalankan go mod download
 RUN go mod download
 #copy main.go ke direktory app
-COPY *.go ./
+COPY . .
 #jalankan build untuk membuat file executable
 RUN go build -o program
 # jalankan file executable hasil build
