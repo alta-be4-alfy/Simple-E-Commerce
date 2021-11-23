@@ -15,8 +15,8 @@ type Orders struct {
 
 type OrderBody struct {
 	Shopping_CartsID []int           `gorm:"unique" json:"shopping_cartsid" form:"shopping_cartsid"`
-	Address          Address         `json:"address_id" form:"shopping_cartsid"`
-	Payment_Methods  Payment_Methods `json:"payment_method_id" form:"payment_method_id"`
+	Address          Address         `json:"address" form:"address"`
+	Payment_Methods  Payment_Methods `json:"payment_method" form:"payment_method"`
 	UsersID          int             `json:"users_id" form:"users_id"`
 }
 
