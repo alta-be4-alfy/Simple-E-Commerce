@@ -88,6 +88,12 @@ var (
 		AddressID:         1,
 		UsersID:           1,
 	}
+	mock_update_order = models.Orders{
+		Order_Status:      "cancel",
+		Payment_MethodsID: 1,
+		AddressID:         1,
+		UsersID:           1,
+	}
 	mock_data_orderdetail = models.Order_Details{
 		OrdersID:         1,
 		Shopping_CartsID: 1,
@@ -392,8 +398,9 @@ func TestGetHistoryOrdersControllerFailed(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	// Menghapus tabel order untuk membuat request failed
-	config.DB.Migrator().DropTable(&models.Orders{})
+
+	// Menghapus tabel order details untuk membuat request failed
+	config.DB.Migrator().DropTable(&models.Order_Details{})
 
 	req := httptest.NewRequest(http.MethodGet, "/orders/history", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -430,8 +437,14 @@ func TestHistoryGetOrdersControllerNoOrder(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	config.DB.Save(&mock_data_address)
+	config.DB.Save(&mock_data_payment)
+	config.DB.Save(&mock_update_order)
+	config.DB.Save(&mock_data_product)
+	config.DB.Save(&mock_data_shoppingcart)
+	config.DB.Save(&mock_data_orderdetail)
 
-	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
+	req := httptest.NewRequest(http.MethodGet, "/orders/history", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
 	rec := httptest.NewRecorder()
@@ -470,8 +483,13 @@ func TestGetCancelOrdersControllerSuccess(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	mock_data_order.Order_Status = "cancel"
-	InsertMockDataToDB()
+
+	config.DB.Save(&mock_data_address)
+	config.DB.Save(&mock_data_payment)
+	config.DB.Save(&mock_update_order)
+	config.DB.Save(&mock_data_product)
+	config.DB.Save(&mock_data_shoppingcart)
+	config.DB.Save(&mock_data_orderdetail)
 
 	req := httptest.NewRequest(http.MethodGet, "/orders/cancel", nil)
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -567,97 +585,97 @@ func TestCancelGetOrdersControllerNoOrder(t *testing.T) {
 	})
 }
 
-func CreateOrderDetailControllerTesting() echo.HandlerFunc {
-	return CreateOrderDetailController
-}
+// func CreateOrderControllerTesting() echo.HandlerFunc {
+// 	return CreateOrderController
+// }
 
-// Fungsi untuk melakukan testing fungsi CreateOrderController menggunakan JWT
-// kondisi request success
-func TestCreateOrderDetailControllerSuccess(t *testing.T) {
-	var testCases = OrdersTestCase{
-		Name:       "success to create order detail",
-		Path:       "/orders/detail",
-		ExpectCode: http.StatusOK,
-	}
+// // Fungsi untuk melakukan testing fungsi CreateOrderController menggunakan JWT
+// // kondisi request success
+// func TestCreateOrderDetailControllerSuccess(t *testing.T) {
+// 	var testCases = OrdersTestCase{
+// 		Name:       "success to create order detail",
+// 		Path:       "/orders/detail",
+// 		ExpectCode: http.StatusOK,
+// 	}
 
-	e := InitEchoTestAPI()
-	config.DB.Save(&mock_data_address)
-	config.DB.Save(&mock_data_payment)
-	config.DB.Save(&mock_data_order)
-	config.DB.Save(&mock_data_product)
-	config.DB.Save(&mock_data_shoppingcart)
+// 	e := InitEchoTestAPI()
+// 	config.DB.Save(&mock_data_address)
+// 	config.DB.Save(&mock_data_payment)
+// 	config.DB.Save(&mock_data_order)
+// 	config.DB.Save(&mock_data_product)
+// 	config.DB.Save(&mock_data_shoppingcart)
 
-	token, err := UsingJWT()
-	if err != nil {
-		panic(err)
-	}
+// 	token, err := UsingJWT()
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	body, err := json.Marshal(mock_data_orderdetail)
-	if err != nil {
-		t.Error(t, err, "error")
-	}
+// 	body, err := json.Marshal(mock_data_orderdetail)
+// 	if err != nil {
+// 		t.Error(t, err, "error")
+// 	}
 
-	// Mengirim data menggunakan request body dengan HTTP Method POST
-	req := httptest.NewRequest(http.MethodPost, "/orders/detail", bytes.NewBuffer(body))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
-	rec := httptest.NewRecorder()
-	context := e.NewContext(req, rec)
+// 	// Mengirim data menggunakan request body dengan HTTP Method POST
+// 	req := httptest.NewRequest(http.MethodPost, "/orders/detail", bytes.NewBuffer(body))
+// 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+// 	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+// 	rec := httptest.NewRecorder()
+// 	context := e.NewContext(req, rec)
 
-	middleware.JWT([]byte(constants.SECRET_JWT))(CreateOrderDetailControllerTesting())(context)
+// 	middleware.JWT([]byte(constants.SECRET_JWT))(CreateOrderDetailControllerTesting())(context)
 
-	bodyResponses := rec.Body.String()
-	var order SingleOrderResponseSuccess
+// 	bodyResponses := rec.Body.String()
+// 	var order SingleOrderResponseSuccess
 
-	er := json.Unmarshal([]byte(bodyResponses), &order)
-	if er != nil {
-		assert.Error(t, er, "error")
-	}
-	t.Run("POST /jwt/orders/detail", func(t *testing.T) {
-		assert.Equal(t, testCases.ExpectCode, rec.Code)
-		assert.Equal(t, "success", order.Status)
-	})
-}
+// 	er := json.Unmarshal([]byte(bodyResponses), &order)
+// 	if er != nil {
+// 		assert.Error(t, er, "error")
+// 	}
+// 	t.Run("POST /jwt/orders/detail", func(t *testing.T) {
+// 		assert.Equal(t, testCases.ExpectCode, rec.Code)
+// 		assert.Equal(t, "success", order.Status)
+// 	})
+// }
 
-// Fungsi untuk melakukan testing fungsi CreateOrderController menggunakan JWT
-// kondisi request failed
-func TestCreateOrderDetailControllerFailed(t *testing.T) {
-	var testCases = OrdersTestCase{
-		Name:       "failed to create order detail",
-		Path:       "/orders",
-		ExpectCode: http.StatusBadRequest,
-	}
+// // Fungsi untuk melakukan testing fungsi CreateOrderController menggunakan JWT
+// // kondisi request failed
+// func TestCreateOrderDetailControllerFailed(t *testing.T) {
+// 	var testCases = OrdersTestCase{
+// 		Name:       "failed to create order detail",
+// 		Path:       "/orders",
+// 		ExpectCode: http.StatusBadRequest,
+// 	}
 
-	e := InitEchoTestAPI()
+// 	e := InitEchoTestAPI()
 
-	token, err := UsingJWT()
-	if err != nil {
-		panic(err)
-	}
-	body, err := json.Marshal(mock_data_orderdetail)
-	if err != nil {
-		t.Error(t, err, "error")
-	}
-	// Menghapus tabel user untuk membuat request failed
-	config.DB.Migrator().DropTable(&models.Order_Details{})
+// 	token, err := UsingJWT()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	body, err := json.Marshal(mock_data_orderdetail)
+// 	if err != nil {
+// 		t.Error(t, err, "error")
+// 	}
+// 	// Menghapus tabel user untuk membuat request failed
+// 	config.DB.Migrator().DropTable(&models.Order_Details{})
 
-	req := httptest.NewRequest(http.MethodPost, "/orders/detail", bytes.NewBuffer(body))
-	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
-	rec := httptest.NewRecorder()
-	context := e.NewContext(req, rec)
-	context.SetPath(testCases.Path)
+// 	req := httptest.NewRequest(http.MethodPost, "/orders/detail", bytes.NewBuffer(body))
+// 	req.Header.Set(echo.HeaderAuthorization, fmt.Sprintf("Bearer %v", token))
+// 	rec := httptest.NewRecorder()
+// 	context := e.NewContext(req, rec)
+// 	context.SetPath(testCases.Path)
 
-	// Call function on controller
-	middleware.JWT([]byte(constants.SECRET_JWT))(CreateOrderDetailControllerTesting())(context)
-	bodyResponses := rec.Body.String()
-	var order OrdersResponseFailed
+// 	// Call function on controller
+// 	middleware.JWT([]byte(constants.SECRET_JWT))(CreateOrderDetailControllerTesting())(context)
+// 	bodyResponses := rec.Body.String()
+// 	var order OrdersResponseFailed
 
-	er := json.Unmarshal([]byte(bodyResponses), &order)
-	if er != nil {
-		assert.Error(t, er, "error")
-	}
-	t.Run("POST /jwt/orders/detail", func(t *testing.T) {
-		assert.Equal(t, testCases.ExpectCode, rec.Code)
-		assert.Equal(t, "failed", order.Status)
-	})
-}
+// 	er := json.Unmarshal([]byte(bodyResponses), &order)
+// 	if er != nil {
+// 		assert.Error(t, er, "error")
+// 	}
+// 	t.Run("POST /jwt/orders/detail", func(t *testing.T) {
+// 		assert.Equal(t, testCases.ExpectCode, rec.Code)
+// 		assert.Equal(t, "failed", order.Status)
+// 	})
+// }
