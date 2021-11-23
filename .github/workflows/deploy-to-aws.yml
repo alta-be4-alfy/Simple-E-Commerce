@@ -22,4 +22,4 @@ jobs:
           docker stop programapp
           docker rm programapp
           docker build -t alta-be4-app:latest .
-          docker run -d -e "CONNECTION_STRING=admin:qwertyui@tcp(project1.c7rhaxrawrqb.us-east-2.rds.amazonaws.com:3306)/project1_kelompok3?charset=utf8&parseTime=True&loc=Local" -p 80:8080 --name programapp alta-be4-app:latest
+          docker run -d -e "CONNECTION_STRING=admin:qwertyui@tcp(project1.c7rhaxrawrqb.us-east-2.rds.amazonaws.com:3306)/project1?charset=utf8&parseTime=True&loc=Local" -p 80:8080 --name programapp alta-be4-app:latest
