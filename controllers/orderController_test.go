@@ -65,8 +65,13 @@ var (
 		Email:        "alfa@gmail.com",
 		Password:     "inipwd",
 		Gender:       "male",
+<<<<<<< HEAD
 		Birth:        `1999 - 10 - 10`,
 		Phone_Number: "9347993747",
+=======
+		Birth:        "1999-10-10",
+		Phone_Number: "23425365",
+>>>>>>> feature-product
 	}
 	mock_data_product = models.Products{
 		Product_Name:        "Android Mini",

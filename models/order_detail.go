@@ -10,12 +10,13 @@ type Order_Details struct {
 	Total_Price      int `json:"total_price" form:"total_price"`
 }
 
-type Order_DetailsResponse struct {
-	ID               uint
-	OrdersID         int
-	Shopping_CartsID int
-	Qty              int
-	Total_Price      int
-	Product_Name     string
-	User_Name        string
+type GetOrderDetailResponse struct {
+	ID           uint
+	OrdersID     uint
+	Order_Status string
+	Qty          int
+	Total_Price  int
+	User_Name    string
+	ProductsID   uint
+	Product_Name string
 }
